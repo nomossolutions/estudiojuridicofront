@@ -1,0 +1,15 @@
+.navhover:hover{
+background-color: #1E3A5F;
+transition: background-color 0.3s ease, color 0.3s ease;
+color: #fff;
+}
+
+.navhover:active{
+background-color: #162E4A;
+}
+
+.menu:hover {
+  max-height: 100vh;
+  overflow-y: auto;
+position: sticky;
+}

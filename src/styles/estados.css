@@ -1,0 +1,46 @@
+.estado-pagada,
+.estado-anulada,
+.estado-pendiente,
+.estado-proceso,
+.estado-completada,
+.estado-cancelada,
+.estado-reprogramada {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 5px;
+  min-width: 130px;
+}
+
+.estado-pagada,
+.estado-completada {
+  background-color: #157347;
+  color: #fff;
+  font-weight: bold;
+}
+
+
+.estado-pendiente{
+  background-color: #dc3545;
+  color: #fff;
+  font-weight: bold;
+}
+
+
+.estado-proceso{
+  background-color: #c47f00;
+  color: #f1efef;
+  font-weight: bold;
+}
+
+.estado-cancelada,
+.estado-anulada {
+  background-color: #83868b;
+  color: #fff;
+  font-weight: bold;
+}
+
+.estado-reprogramada {
+  background-color: #3546dc;
+  color: #fff;
+  font-weight: bold;
+}

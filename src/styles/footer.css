@@ -1,0 +1,28 @@
+.backgraundFooter {
+  background-color: #1e3a5f;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  width: 100%;
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+}
+
+.footer-text {
+  color: #f0f0f0;
+}
+
+.footer-link {
+  color: #ffffff;
+  text-decoration: none;
+    white-space: nowrap;
+}
+
+.footer-link:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+

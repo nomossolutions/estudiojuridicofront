@@ -1,0 +1,31 @@
+main{
+    flex: 1;
+}
+
+.menu-container {
+  background-color: #f8f9fa;
+  min-height: 100%;
+  padding: 1rem;
+}
+
+@media (max-width: 992px) {
+  .menu-container {
+    display: none !important;
+  }
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+main {
+  flex: 1;
+}
+
+.menu {
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+}

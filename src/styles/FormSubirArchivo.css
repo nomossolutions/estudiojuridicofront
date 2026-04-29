@@ -1,0 +1,9 @@
+.SubirArchivo {
+    width: 18rem; 
+    padding: 25px; 
+    background-color: #1E3A5F; 
+    position: relative;
+    top: 50px; 
+    left: 70%;
+    color: white;
+}
