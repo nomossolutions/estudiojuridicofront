@@ -28,7 +28,16 @@ export function RegistroPage() {
     ) {
       user.role = "admin";
      localStorage.setItem("user", JSON.stringify(user));
-      navegacion("/app/inicioadmi");
+      Swal.fire({
+        icon: "success",
+        title: "¡Inicio de sesión exitoso!",
+        text: "Bienvenido al sistema.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      setTimeout(() => {
+        navegacion("/app/inicioadmi");
+      }, 2000);
       return;
     }
 
@@ -57,11 +66,21 @@ export function RegistroPage() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data));
       
+      Swal.fire({
+        icon: "success",
+        title: "¡Inicio de sesión exitoso!",
+        text: "Bienvenido al sistema.",
+        timer: 2000,
+        showConfirmButton: false,
+      });
+      
       const rol = data.role ? data.role.toLowerCase() : "";
-      if (rol === "admin") navegacion("/app/inicioadmi");
-      else if (rol === "secre") navegacion("/app/iniciosecre");
-      else if (rol === "abog") navegacion("/app/inicioabog");
-      else navegacion("/app/inicio");
+      setTimeout(() => {
+        if (rol === "admin") navegacion("/app/inicioadmi");
+        else if (rol === "secre") navegacion("/app/iniciosecre");
+        else if (rol === "abog") navegacion("/app/inicioabog");
+        else navegacion("/app/inicio");
+      }, 2000);
     } catch (error) {
       Swal.fire({
         icon: "error",

@@ -35,38 +35,21 @@ const FormNuevoJuicio = ({ show, onHide, onGuardar, itemEditar = null }) => {
   }, [itemEditar, setValue, reset]);
 
   const onSubmit = async (data) => {
-    try {
-      const formData = new FormData();
-      formData.append("nombreDeJuicio", data.nombreDeJuicio);
-      formData.append("numeroExpediente", data.numeroExpediente);
-      formData.append("nombreCliente", data.nombreCliente);
-      formData.append("juzgado", data.juzgado);
-      formData.append(
-        "fecha",
-        new Date(`${data.fecha}T00:00:00`).toISOString()
-      );
-      if (data.seleccionarArchivo && data.seleccionarArchivo[0]) {
-        formData.append("seleccionarArchivo", data.seleccionarArchivo[0]);
-      }
-      await onGuardar(formData, itemEditar?._id);
-      Swal.fire({
-        icon: "success",
-        title: itemEditar ? "¡Juicio actualizado!" : "¡Juicio agregado!",
-        text: itemEditar
-          ? "El Juicio fue actualizado exitosamente."
-          : "El Juicio fue agregadao exitosamente.",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-      reset();
-      onHide();
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error al guardar el juicio",
-        text: "No se pudo guardar el juicio. Inténtalo de nuevo.",
-      });
+    const formData = new FormData();
+    formData.append("nombreDeJuicio", data.nombreDeJuicio);
+    formData.append("numeroExpediente", data.numeroExpediente);
+    formData.append("nombreCliente", data.nombreCliente);
+    formData.append("juzgado", data.juzgado);
+    formData.append(
+      "fecha",
+      new Date(`${data.fecha}T00:00:00`).toISOString()
+    );
+    if (data.seleccionarArchivo && data.seleccionarArchivo[0]) {
+      formData.append("seleccionarArchivo", data.seleccionarArchivo[0]);
     }
+    await onGuardar(formData, itemEditar?._id);
+    reset();
+    onHide();
   };
 
   const handleCancel = () => {
@@ -112,10 +95,10 @@ const FormNuevoJuicio = ({ show, onHide, onGuardar, itemEditar = null }) => {
       <Modal.Body>
         <Form onSubmit={handleSubmit(onSubmit)}>
           <Form.Group className="mb-3" controlId="nombreDeJuicio">
-            <Form.Label>Nombre de Juicio: </Form.Label>
+            <Form.Label>Nombre de Juicio:</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Ej: Demanda por accidente de tráfico..."
+              placeholder="Ej: Demanda por accidente de tránsito..."
               {...register("nombreDeJuicio", {
                 required: "El nombre del juicio es obligatorio",
                 minLength: {
@@ -126,33 +109,38 @@ const FormNuevoJuicio = ({ show, onHide, onGuardar, itemEditar = null }) => {
                 maxLength: {
                   value: 100,
                   message:
-                    "El nombre del juicio debe tener como máximo 50 caracteres",
+                    "El nombre del juicio debe tener como máximo 100 caracteres",
                 },
               })}
+              isInvalid={!!errors.nombreDeJuicio}
             />
-            <Form.Text className="text-danger">
+            <Form.Control.Feedback type="invalid">
               {errors.nombreDeJuicio?.message}
-            </Form.Text>
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3" controlId="numeroExpediente">
-            <Form.Label>Numero de expediente :</Form.Label>
+            <Form.Label>Número de expediente:</Form.Label>
             <Form.Control
-              type="number"
-              placeholder="Ej: 2030/234567"
+              type="text"
+              placeholder="Ej: EXP-2024-123456"
               {...register("numeroExpediente", {
                 required: "El nº de expediente es obligatorio",
+                pattern: {
+                  value: /^[A-Z0-9-/]+$/i,
+                  message: "Formato inválido. Use letras, números, - o /",
+                },
               })}
               isInvalid={!!errors.numeroExpediente}
             />
-            <Form.Text className="text-danger">
+            <Form.Control.Feedback type="invalid">
               {errors.numeroExpediente?.message}
-            </Form.Text>
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3" controlId="nombreCliente">
             <Form.Label>Cliente:</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Ej:Juan Perez"
+              placeholder="Ej: Juan Perez"
               {...register("nombreCliente", {
                 required: "El nombre del cliente es obligatorio",
                 minLength: {
@@ -166,12 +154,11 @@ const FormNuevoJuicio = ({ show, onHide, onGuardar, itemEditar = null }) => {
                     "El nombre del cliente debe tener como máximo 40 caracteres",
                 },
               })}
+              isInvalid={!!errors.nombreCliente}
             />
-            {errors.nombreCliente && (
-              <small className="text-danger">
-                {errors.nombreCliente.message}
-              </small>
-            )}
+            <Form.Control.Feedback type="invalid">
+              {errors.nombreCliente?.message}
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3" controlId="juzgado">
             <Form.Label>Juzgado</Form.Label>
@@ -179,6 +166,7 @@ const FormNuevoJuicio = ({ show, onHide, onGuardar, itemEditar = null }) => {
               {...register("juzgado", {
                 required: "El juzgado es obligatorio",
               })}
+              isInvalid={!!errors.juzgado}
             >
               <option value="">Seleccionar juzgado...</option>
               {juzgadosTucuman.map((juzgado, index) => (
@@ -187,39 +175,65 @@ const FormNuevoJuicio = ({ show, onHide, onGuardar, itemEditar = null }) => {
                 </option>
               ))}
             </Form.Select>
-            {errors.juzgado && (
-              <small className="text-danger">{errors.juzgado.message}</small>
-            )}
+            <Form.Control.Feedback type="invalid">
+              {errors.juzgado?.message}
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3" controlId="fecha">
             <Form.Label>Fecha:</Form.Label>
             <Form.Control
               type="date"
               {...register("fecha", {
-                required: "La fecha es obligatorio",
+                required: "La fecha es obligatoria",
               })}
+              isInvalid={!!errors.fecha}
             />
-            {errors.fecha && (
-              <small className="text-danger">{errors.fecha.message}</small>
-            )}
+            <Form.Control.Feedback type="invalid">
+              {errors.fecha?.message}
+            </Form.Control.Feedback>
           </Form.Group>
-       <Form.Group className="mb-3" controlId="seleccionarArchivo">
-            <Form.Label className="mt-2 m-2">Archivo</Form.Label>
-            {itemEditar && (
-              <a
-                href={itemEditar.seleccionarArchivo?.url}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {itemEditar.seleccionarArchivo?.nombre || "Ver archivo"}
-              </a>
+          <Form.Group className="mb-3" controlId="seleccionarArchivo">
+            <Form.Label>Archivo del expediente</Form.Label>
+            {itemEditar && itemEditar.seleccionarArchivo && (
+              <div className="mb-2">
+                <small className="text-muted">Archivo actual: </small>
+                <a
+                  href={itemEditar.seleccionarArchivo?.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary"
+                >
+                  {itemEditar.seleccionarArchivo?.nombre || "Ver archivo"}
+                </a>
+              </div>
             )}
-            <Form.Control type="file" {...register("seleccionarArchivo")} />
-            {errors.seleccionarArchivo && (
-              <small className="text-danger">
-                {errors.seleccionarArchivo.message}
-              </small>
-            )}
+            <Form.Control 
+              type="file" 
+              accept=".pdf,.doc,.docx"
+              {...register("seleccionarArchivo", {
+                required: !itemEditar ? "Debe seleccionar un archivo" : false,
+                validate: (value) => {
+                  if (!value || value.length === 0) return true;
+                  const file = value[0];
+                  const maxSize = 20 * 1024 * 1024; // 20MB
+                  if (file.size > maxSize) {
+                    return "El archivo no debe superar los 20MB";
+                  }
+                  const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                  if (!validTypes.includes(file.type)) {
+                    return "Formato no válido. Use PDF, DOC o DOCX";
+                  }
+                  return true;
+                }
+              })}
+              isInvalid={!!errors.seleccionarArchivo}
+            />
+            <Form.Text className="text-muted">
+              Formatos: PDF, DOC, DOCX (máx. 20MB)
+            </Form.Text>
+            <Form.Control.Feedback type="invalid">
+              {errors.seleccionarArchivo?.message}
+            </Form.Control.Feedback>
           </Form.Group>
 
           <div className="justify-content-end d-flex">

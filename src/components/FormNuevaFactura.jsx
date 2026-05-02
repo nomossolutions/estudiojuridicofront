@@ -35,38 +35,21 @@ const FormNuevaFactura = ({ show, onHide, onGuardar, itemEditar = null }) => {
   }, [itemEditar, setValue, reset]);
 
   const onSubmit = async (data) => {
-    try {
-      const formData = new FormData();
-      formData.append(
-        "fecha",
-        new Date(`${data.fecha}T00:00:00`).toISOString()
-      );
-      formData.append("nombreCliente", data.nombreCliente);
-      formData.append("concepto", data.concepto);
-      formData.append("monto", data.monto);
-      formData.append("estado", data.estado);
-      if (data.seleccionarArchivo && data.seleccionarArchivo[0]) {
-        formData.append("seleccionarArchivo", data.seleccionarArchivo[0]);
-      }
-      await onGuardar(formData, itemEditar?._id);
-      Swal.fire({
-        icon: "success",
-        title: itemEditar ? "¡Factura actualizada!" : "¡Factura agregada!",
-        text: itemEditar
-          ? "La factura fue actualizada exitosamente."
-          : "La factura fue agregada exitosamente.",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-      reset();
-      onHide();
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error al guardar la factura",
-        text: "No se pudo guardar la factura. Inténtalo de nuevo.",
-      });
+    const formData = new FormData();
+    formData.append(
+      "fecha",
+      new Date(`${data.fecha}T00:00:00`).toISOString()
+    );
+    formData.append("nombreCliente", data.nombreCliente);
+    formData.append("concepto", data.concepto);
+    formData.append("monto", data.monto);
+    formData.append("estado", data.estado);
+    if (data.seleccionarArchivo && data.seleccionarArchivo[0]) {
+      formData.append("seleccionarArchivo", data.seleccionarArchivo[0]);
     }
+    await onGuardar(formData, itemEditar?._id);
+    reset();
+    onHide();
   };
 
   const handleCancel = () => {
@@ -84,23 +67,24 @@ const FormNuevaFactura = ({ show, onHide, onGuardar, itemEditar = null }) => {
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit(onSubmit)}>
-          <Form.Group controlId="fecha">
+          <Form.Group className="mb-3" controlId="fecha">
             <Form.Label>Fecha</Form.Label>
             <Form.Control
               type="date"
               {...register("fecha", {
                 required: "La fecha es obligatoria",
               })}
+              isInvalid={!!errors.fecha}
             />
-            {errors.fecha && (
-              <small className="text-danger">{errors.fecha.message}</small>
-            )}
+            <Form.Control.Feedback type="invalid">
+              {errors.fecha?.message}
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3" controlId="nombreCliente">
             <Form.Label>Nombre del cliente</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Juan Perez"
+              placeholder="Ej: Juan Perez"
               {...register("nombreCliente", {
                 required: "El nombre del cliente es obligatorio",
                 minLength: {
@@ -114,59 +98,88 @@ const FormNuevaFactura = ({ show, onHide, onGuardar, itemEditar = null }) => {
                     "El nombre del cliente debe tener como máximo 30 caracteres",
                 },
               })}
+              isInvalid={!!errors.nombreCliente}
             />
-            <Form.Text className="text-danger">
+            <Form.Control.Feedback type="invalid">
               {errors.nombreCliente?.message}
-            </Form.Text>
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3" controlId="concepto">
             <Form.Label>Concepto</Form.Label>
             <Form.Control
-              type="text"
-              placeholder="Concepto de la factura..."
+              as="textarea"
+              rows={2}
+              placeholder="Ej: Honorarios por asesoramiento legal..."
               {...register("concepto", {
                 required: "El concepto de la factura es obligatorio",
                 minLength: {
                   value: 15,
                   message:
-                    "El concepto de la factura debe tener como mínimo 10 caracteres",
+                    "El concepto debe tener como mínimo 15 caracteres",
                 },
                 maxLength: {
-                  value: 50,
+                  value: 100,
                   message:
-                    "El concepto de la factura debe tener como máximo 50 caracteres",
+                    "El concepto debe tener como máximo 100 caracteres",
                 },
               })}
+              isInvalid={!!errors.concepto}
             />
-            <Form.Text className="text-danger">
+            <Form.Control.Feedback type="invalid">
               {errors.concepto?.message}
-            </Form.Text>
+            </Form.Control.Feedback>
           </Form.Group>
-        <Form.Group className="mb-3" controlId="seleccionarArchivo">
-            <Form.Label className="mt-2 m-2">Archivo</Form.Label>
-            {itemEditar && (
-              <a
-                href={itemEditar.seleccionarArchivo?.url}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {itemEditar.seleccionarArchivo?.nombre || "Ver archivo"}
-              </a>
+          <Form.Group className="mb-3" controlId="seleccionarArchivo">
+            <Form.Label>Archivo de factura</Form.Label>
+            {itemEditar && itemEditar.seleccionarArchivo && (
+              <div className="mb-2">
+                <small className="text-muted">Archivo actual: </small>
+                <a
+                  href={itemEditar.seleccionarArchivo?.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary"
+                >
+                  {itemEditar.seleccionarArchivo?.nombre || "Ver archivo"}
+                </a>
+              </div>
             )}
-            <Form.Control type="file" {...register("seleccionarArchivo")} />
-            {errors.seleccionarArchivo && (
-              <small className="text-danger">
-                {errors.seleccionarArchivo.message}
-              </small>
-            )}
+            <Form.Control 
+              type="file" 
+              accept=".pdf,.jpg,.jpeg,.png"
+              {...register("seleccionarArchivo", {
+                required: !itemEditar ? "Debe seleccionar un archivo" : false,
+                validate: (value) => {
+                  if (!value || value.length === 0) return true;
+                  const file = value[0];
+                  const maxSize = 10 * 1024 * 1024; // 10MB
+                  if (file.size > maxSize) {
+                    return "El archivo no debe superar los 10MB";
+                  }
+                  const validTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+                  if (!validTypes.includes(file.type)) {
+                    return "Formato no válido. Use PDF, JPG o PNG";
+                  }
+                  return true;
+                }
+              })}
+              isInvalid={!!errors.seleccionarArchivo}
+            />
+            <Form.Text className="text-muted">
+              Formatos: PDF, JPG, PNG (máx. 10MB)
+            </Form.Text>
+            <Form.Control.Feedback type="invalid">
+              {errors.seleccionarArchivo?.message}
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3" controlId="monto">
             <Form.Label>Monto</Form.Label>
-            <InputGroup>
+            <InputGroup hasValidation>
               <InputGroup.Text>$</InputGroup.Text>
               <Form.Control
                 type="number"
                 step="0.01"
+                placeholder="0.00"
                 {...register("monto", {
                   required: "El monto es obligatorio",
                   min: {
@@ -174,11 +187,12 @@ const FormNuevaFactura = ({ show, onHide, onGuardar, itemEditar = null }) => {
                     message: "El monto debe ser mayor a 0",
                   },
                 })}
+                isInvalid={!!errors.monto}
               />
+              <Form.Control.Feedback type="invalid">
+                {errors.monto?.message}
+              </Form.Control.Feedback>
             </InputGroup>
-            {errors.monto && (
-              <small className="text-danger">{errors.monto.message}</small>
-            )}
           </Form.Group>
           <Form.Group className="mb-3" controlId="estado">
             <Form.Label>Estado</Form.Label>
@@ -186,15 +200,16 @@ const FormNuevaFactura = ({ show, onHide, onGuardar, itemEditar = null }) => {
               {...register("estado", {
                 required: "El estado es obligatorio",
               })}
+              isInvalid={!!errors.estado}
             >
               <option value="">Seleccionar estado...</option>
               <option value="Pagada">Pagada</option>
               <option value="Pendiente">Pendiente</option>
               <option value="Anulada">Anulada</option>
             </Form.Select>
-            {errors.estado && (
-              <small className="text-danger">{errors.estado.message}</small>
-            )}
+            <Form.Control.Feedback type="invalid">
+              {errors.estado?.message}
+            </Form.Control.Feedback>
           </Form.Group>
           <div className="d-flex justify-content-end mt-4">
             <Button variant="secondary" onClick={handleCancel} className="me-2">

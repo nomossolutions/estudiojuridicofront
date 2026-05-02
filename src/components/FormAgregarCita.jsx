@@ -48,30 +48,13 @@ const FormAgregarCita = ({
   }, [itemEditar, setValue, reset]);
 
   const onSubmit = async (data) => {
-    try {
-      if (itemEditar && itemEditar._id) {
-        data._id = itemEditar._id;
-      }
-      data.fecha = new Date(`${data.fecha}T${data.hora}:00`).toISOString();
-      await onGuardar(data);
-      Swal.fire({
-        icon: "success",
-        title: itemEditar ? "¡Cita actualizada!" : "¡Cita agregada!",
-        text: itemEditar
-          ? "La cita fue actualizada exitosamente."
-          : "La cita fue agregada exitosamente.",
-        timer: 2000,
-        showConfirmButton: false,
-      });
-      reset();
-      onHide();
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "No se pudo guardar la cita. Intenta nuevamente.",
-      });
+    if (itemEditar && itemEditar._id) {
+      data._id = itemEditar._id;
     }
+    data.fecha = new Date(`${data.fecha}T${data.hora}:00`).toISOString();
+    await onGuardar(data);
+    reset();
+    onHide();
   };
   const handleCancel = () => {
     reset();
@@ -88,22 +71,24 @@ const FormAgregarCita = ({
       </Modal.Header>
       <Modal.Body>
         <Form onSubmit={handleSubmit(onSubmit)}>
-          <Form.Group controlId="fecha">
+          <Form.Group controlId="fecha" className="mb-3">
             <Form.Label>Fecha</Form.Label>
             <Form.Control
               type="date"
               {...register("fecha", {
                 required: "La fecha es obligatoria",
               })}
+              isInvalid={!!errors.fecha}
             />
-            {errors.fecha && (
-              <small className="text-danger">{errors.fecha.message}</small>
-            )}
+            <Form.Control.Feedback type="invalid">
+              {errors.fecha?.message}
+            </Form.Control.Feedback>
           </Form.Group>
-          <Form.Group controlId="hora" className="mt-3">
+          <Form.Group controlId="hora" className="mb-3">
             <Form.Label>Hora</Form.Label>
             <Form.Select
               {...register("hora", { required: "La hora es obligatoria" })}
+              isInvalid={!!errors.hora}
             >
               <option value="">Seleccioná una hora</option>
               <option value="08:00">08:00</option>
@@ -128,11 +113,11 @@ const FormAgregarCita = ({
               <option value="17:30">17:30</option>
               <option value="18:00">18:00</option>
             </Form.Select>
-            {errors.hora && (
-              <small className="text-danger">{errors.hora.message}</small>
-            )}
+            <Form.Control.Feedback type="invalid">
+              {errors.hora?.message}
+            </Form.Control.Feedback>
           </Form.Group>
-          <Form.Group controlId="cliente" className="mt-3">
+          <Form.Group controlId="cliente" className="mb-3">
             <Form.Label>Cliente</Form.Label>
             <Form.Control
               type="text"
@@ -150,14 +135,20 @@ const FormAgregarCita = ({
                     "El nombre del cliente debe tener como máximo 30 caracteres",
                 },
               })}
+              isInvalid={!!errors.cliente}
             />
-            {errors.cliente && (
-              <small className="text-danger">{errors.cliente.message}</small>
-            )}
+            <Form.Control.Feedback type="invalid">
+              {errors.cliente?.message}
+            </Form.Control.Feedback>
           </Form.Group>
-          <Form.Group controlId="abogado" className="mt-3">
+          <Form.Group controlId="abogado" className="mb-3">
             <Form.Label>Abogado asignado</Form.Label>
-            <Form.Select {...register("abogado", { required: true })}>
+            <Form.Select 
+              {...register("abogado", { 
+                required: "Debe seleccionar un abogado" 
+              })}
+              isInvalid={!!errors.abogado}
+            >
               <option value="">Seleccione un abogado</option>
               {abogados.map((abog) => (
                 <option key={abog._id} value={abog._id}>
@@ -166,28 +157,31 @@ const FormAgregarCita = ({
               ))}
             </Form.Select>
             {errors.abogado && (
-              <small className="text-danger">{errors.abogado.message}</small>
+              <Form.Control.Feedback type="invalid">
+                {errors.abogado.message}
+              </Form.Control.Feedback>
             )}
           </Form.Group>
 
-          <Form.Group controlId="tipoEvento" className="mt-3">
+          <Form.Group controlId="tipoEvento" className="mb-3">
             <Form.Label>Tipo de evento</Form.Label>
             <Form.Select
               {...register("tipoEvento", {
                 required: "El tipo de evento es obligatorio",
               })}
+              isInvalid={!!errors.tipoEvento}
             >
               <option value="">Seleccionar tipo de evento...</option>
               <option value="Audiencia">Audiencia</option>
               <option value="Consulta">Consulta</option>
               <option value="Reunion">Reunión</option>
             </Form.Select>
-            {errors.tipoEvento && (
-              <small className="text-danger">{errors.tipoEvento.message}</small>
-            )}
+            <Form.Control.Feedback type="invalid">
+              {errors.tipoEvento?.message}
+            </Form.Control.Feedback>
           </Form.Group>
 
-          <Form.Group controlId="notas" className="mt-3">
+          <Form.Group controlId="notas" className="mb-3">
             <Form.Label>Notas</Form.Label>
             <Form.Control
               as="textarea"
@@ -204,10 +198,11 @@ const FormAgregarCita = ({
                   message: "Las notas no pueden superar los 300 caracteres",
                 },
               })}
+              isInvalid={!!errors.notas}
             />
-            {errors.notas && (
-              <small className="text-danger">{errors.notas.message}</small>
-            )}
+            <Form.Control.Feedback type="invalid">
+              {errors.notas?.message}
+            </Form.Control.Feedback>
           </Form.Group>
 
           <div className="d-flex justify-content-end mt-4">

@@ -30,34 +30,19 @@ const FormSubirArchivo = ({ show, onHide, onGuardar, itemEditar = null }) => {
   }, [itemEditar, setValue, reset]);
 
   const onSubmit = async (data) => {
-    try {
-      const formData = new FormData();
-      formData.append("nombreCliente", data.nombreCliente);
-      formData.append("tipodearchivo", data.tipodearchivo);
-      formData.append(
-        "fecha",
-        new Date(`${data.fecha}T00:00:00`).toISOString()
-      );
-      if (data.seleccionarArchivo && data.seleccionarArchivo[0]) {
-        formData.append("seleccionarArchivo", data.seleccionarArchivo[0]);
-      }
-      await onGuardar(formData, itemEditar?._id);
-      Swal.fire({
-        icon: "success",
-        title: itemEditar ? "¡Documento actualizado!" : "¡Documento agregado!",
-        text: itemEditar
-          ? "El documento fue actualizado exitosamente."
-          : "El documento fue agregado exitosamente.",
-      });
-      reset();
-      onHide();
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error al guardar el documento",
-        text: "Hubo un problema al guardar el documento. Por favor, intenta nuevamente.",
-      });
+    const formData = new FormData();
+    formData.append("nombreCliente", data.nombreCliente);
+    formData.append("tipodearchivo", data.tipodearchivo);
+    formData.append(
+      "fecha",
+      new Date(`${data.fecha}T00:00:00`).toISOString()
+    );
+    if (data.seleccionarArchivo && data.seleccionarArchivo[0]) {
+      formData.append("seleccionarArchivo", data.seleccionarArchivo[0]);
     }
+    await onGuardar(formData, itemEditar?._id);
+    reset();
+    onHide();
   };
   const handleCancel = () => {
     reset();
@@ -78,7 +63,7 @@ const FormSubirArchivo = ({ show, onHide, onGuardar, itemEditar = null }) => {
             <Form.Label>Cliente:</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Juan Perez"
+              placeholder="Ej: Juan Perez"
               {...register("nombreCliente", {
                 required: "El nombre del cliente es obligatorio",
                 minLength: {
@@ -92,10 +77,11 @@ const FormSubirArchivo = ({ show, onHide, onGuardar, itemEditar = null }) => {
                     "El nombre del cliente debe tener como máximo 50 caracteres",
                 },
               })}
+              isInvalid={!!errors.nombreCliente}
             />
-            <Form.Text className="text-danger">
+            <Form.Control.Feedback type="invalid">
               {errors.nombreCliente?.message}
-            </Form.Text>
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3" controlId="tipodearchivo">
             <Form.Label>Tipo de documento legal</Form.Label>
@@ -103,49 +89,74 @@ const FormSubirArchivo = ({ show, onHide, onGuardar, itemEditar = null }) => {
               {...register("tipodearchivo", {
                 required: "El tipo de documento es obligatorio",
               })}
+              isInvalid={!!errors.tipodearchivo}
             >
-              <option value="">Seleccioná una opcion</option>
-              <option value="demanda"> Demanda </option>
-              <option value="contrato"> Contrato</option>
-              <option value="escrito"> Escrito</option>
-              <option value="poder"> Poder</option>
-              <option value="notificacion"> Notificación</option>
+              <option value="">Seleccioná una opción</option>
+              <option value="demanda">Demanda</option>
+              <option value="contrato">Contrato</option>
+              <option value="escrito">Escrito</option>
+              <option value="poder">Poder</option>
+              <option value="notificacion">Notificación</option>
             </Form.Select>
-            {errors.tipodearchivo && (
-              <small className="text-danger">
-                {errors.tipodearchivo.message}
-              </small>
-            )}
+            <Form.Control.Feedback type="invalid">
+              {errors.tipodearchivo?.message}
+            </Form.Control.Feedback>
           </Form.Group>
-          <Form.Group controlId="fecha">
+          <Form.Group className="mb-3" controlId="fecha">
             <Form.Label>Fecha</Form.Label>
             <Form.Control
               type="date"
               {...register("fecha", {
                 required: "La fecha es obligatoria",
               })}
+              isInvalid={!!errors.fecha}
             />
-            {errors.fecha && (
-              <small className="text-danger">{errors.fecha.message}</small>
-            )}
+            <Form.Control.Feedback type="invalid">
+              {errors.fecha?.message}
+            </Form.Control.Feedback>
           </Form.Group>
           <Form.Group className="mb-3" controlId="seleccionarArchivo">
-            <Form.Label className="mt-2 m-2">Archivo</Form.Label>
-            {itemEditar && (
-              <a
-                href={itemEditar.seleccionarArchivo?.url}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {itemEditar.seleccionarArchivo?.nombre || "Ver archivo"}
-              </a>
+            <Form.Label>Archivo</Form.Label>
+            {itemEditar && itemEditar.seleccionarArchivo && (
+              <div className="mb-2">
+                <small className="text-muted">Archivo actual: </small>
+                <a
+                  href={itemEditar.seleccionarArchivo?.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary"
+                >
+                  {itemEditar.seleccionarArchivo?.nombre || "Ver archivo"}
+                </a>
+              </div>
             )}
-            <Form.Control type="file" {...register("seleccionarArchivo")} />
-            {errors.seleccionarArchivo && (
-              <small className="text-danger">
-                {errors.seleccionarArchivo.message}
-              </small>
-            )}
+            <Form.Control 
+              type="file" 
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+              {...register("seleccionarArchivo", {
+                required: !itemEditar ? "Debe seleccionar un archivo" : false,
+                validate: (value) => {
+                  if (!value || value.length === 0) return true;
+                  const file = value[0];
+                  const maxSize = 10 * 1024 * 1024; // 10MB
+                  if (file.size > maxSize) {
+                    return "El archivo no debe superar los 10MB";
+                  }
+                  const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'image/jpeg', 'image/jpg', 'image/png'];
+                  if (!validTypes.includes(file.type)) {
+                    return "Formato no válido. Use PDF, DOC, DOCX, JPG o PNG";
+                  }
+                  return true;
+                }
+              })}
+              isInvalid={!!errors.seleccionarArchivo}
+            />
+            <Form.Text className="text-muted">
+              Formatos: PDF, DOC, DOCX, JPG, PNG (máx. 10MB)
+            </Form.Text>
+            <Form.Control.Feedback type="invalid">
+              {errors.seleccionarArchivo?.message}
+            </Form.Control.Feedback>
           </Form.Group>
           <div className="d-flex justify-content-end mt-4">
             <Button variant="secondary" onClick={handleCancel} className="me-2">

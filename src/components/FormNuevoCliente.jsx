@@ -34,32 +34,12 @@ const FormNuevoCliente = ({ show, onHide, onGuardar, itemEditar = null }) => {
   }, [itemEditar, setValue, reset]);
 
   const onSubmit = async (data) => {
-    try {
-      if (itemEditar && itemEditar._id) {
-        data._id = itemEditar._id;
-      }
-
-      await onGuardar(data);
-      Swal.fire({
-        icon: "success",
-        title: itemEditar
-          ? `¡Cliente ${data.nombre} fue actualizado!`
-          : "¡Cliente agregado!",
-        text: itemEditar
-          ? `El cliente fue actualizado exitosamente.`
-          : "El cliente fue agregado exitosamente.",
-    
-      });
-
-      reset();
-      onHide();
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "No se pudo guardar cliente. Intenta nuevamente.",
-      });
+    if (itemEditar && itemEditar._id) {
+      data._id = itemEditar._id;
     }
+    await onGuardar(data);
+    reset();
+    onHide();
   };
 
   const handleCancel = () => {
@@ -95,24 +75,30 @@ const FormNuevoCliente = ({ show, onHide, onGuardar, itemEditar = null }) => {
                     "El nombre del cliente debe tener como máximo 30 caracteres",
                 },
               })}
+              isInvalid={!!errors.nombre}
             />
-            <Form.Text className="text-danger">
+            <Form.Control.Feedback type="invalid">
               {errors.nombre?.message}
-            </Form.Text>
+            </Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="identificador">
             <Form.Label>DNI / CUIT :</Form.Label>
             <Form.Control
               type="text"
-              placeholder="Ej: 20301234567"
+              placeholder="Ej: 20301234567 o 30123456"
               {...register("identificador", {
                 required: "Este campo es obligatorio",
+                pattern: {
+                  value: /^\d{7,11}$/,
+                  message: "Debe contener entre 7 y 11 dígitos",
+                },
               })}
+              isInvalid={!!errors.identificador}
             />
-            <Form.Text className="text-danger">
+            <Form.Control.Feedback type="invalid">
               {errors.identificador?.message}
-            </Form.Text>
+            </Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="email">
@@ -128,10 +114,11 @@ const FormNuevoCliente = ({ show, onHide, onGuardar, itemEditar = null }) => {
                   message: "El formato del email es incorrecto",
                 },
               })}
+              isInvalid={!!errors.email}
             />
-            <Form.Text className="text-danger">
+            <Form.Control.Feedback type="invalid">
               {errors.email?.message}
-            </Form.Text>
+            </Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="telefono">
@@ -139,18 +126,19 @@ const FormNuevoCliente = ({ show, onHide, onGuardar, itemEditar = null }) => {
             <Form.Control
               type="tel"
               inputMode="numeric"
-              placeholder="3813005896"
+              placeholder="Ej: 3813005896"
               {...register("telefono", {
                 required: "El teléfono es obligatorio",
                 pattern: {
-                  value: /^\d+$/,
-                  message: "Solo se permiten números",
+                  value: /^\d{8,15}$/,
+                  message: "Debe contener entre 8 y 15 dígitos",
                 },
               })}
+              isInvalid={!!errors.telefono}
             />
-            <Form.Text className="text-danger">
+            <Form.Control.Feedback type="invalid">
               {errors.telefono?.message}
-            </Form.Text>
+            </Form.Control.Feedback>
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="estadoCliente">
@@ -159,16 +147,15 @@ const FormNuevoCliente = ({ show, onHide, onGuardar, itemEditar = null }) => {
               {...register("estadoCliente", {
                 required: "El estado del cliente es obligatorio",
               })}
+              isInvalid={!!errors.estadoCliente}
             >
               <option value="">Seleccionar estado</option>
               <option value="Activo">Activo</option>
               <option value="Inactivo">Inactivo</option>
             </Form.Select>
-            {errors.estadoCliente && (
-              <small className="text-danger">
-                {errors.estadoCliente.message}
-              </small>
-            )}
+            <Form.Control.Feedback type="invalid">
+              {errors.estadoCliente?.message}
+            </Form.Control.Feedback>
           </Form.Group>
 
           <div className="justify-content-end d-flex">
