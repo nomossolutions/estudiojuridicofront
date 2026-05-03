@@ -4,24 +4,28 @@
 }
 
 .navhover:hover {
-  background-color: #1E3A5F;
+  background-color: #4A6FA5;
   color: #fff;
 }
 
 .navhover:active {
-  background-color: #162E4A;
+  background-color: #4A6FA5;
 }
 
 .navhover.active {
-  background-color: #2C5282;
+  background-color: #4A6FA5;
   color: #fff;
-  border-left: 4px solid #3b82f6;
+  
 }
 
 .menu:hover {
   max-height: 100vh;
   overflow-y: auto;
   position: sticky;
+}
+
+.bg-oxford-navy {
+  background-color: #003262;
 }
 
 .botonCerrarSesion {

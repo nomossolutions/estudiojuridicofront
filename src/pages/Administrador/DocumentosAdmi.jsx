@@ -1,7 +1,7 @@
 import Tablageneral from "../../components/TablaGeneral";
 import Boton from "../../components/Boton";
 import { useState, useEffect } from "react";
-import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import BarraBusqueda from "../../components/BarraBusqueda";
 import BarraBusquedaFecha from "../../components/BarraBusquedaFecha";
 import {
@@ -51,14 +51,14 @@ const DocumentosAdmi = () => {
   const descargar = async (id) => {
     const respuesta = await descargarDocumento(id);
     if (respuesta) {
-      Swal.fire({
-        icon: "success",
-        title: "¡Documento descargado!",
+      toast.success("¡Documento descargado!", {
+        position: "top-right",
+        autoClose: 3000,
       });
     } else {
-      Swal.fire({
-        icon: "error",
-        title: "Error al descargar el documento",
+      toast.error("Error al descargar el documento", {
+        position: "top-right",
+        autoClose: 3000,
       });
     }
   };

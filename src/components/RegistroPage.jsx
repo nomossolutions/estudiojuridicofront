@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FaEye, FaEyeSlash, FaUser, FaLock } from "react-icons/fa";
-import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import { login } from "../helper/login.Api";
 
 // Constantes de roles
@@ -58,12 +58,9 @@ export function RegistroPage() {
       };
       localStorage.setItem("user", JSON.stringify(adminUser));
       
-      await Swal.fire({
-        icon: "success",
-        title: "¡Bienvenido!",
-        text: "Has iniciado sesión correctamente.",
-        timer: 1500,
-        showConfirmButton: false,
+      toast.success("¡Bienvenido! Has iniciado sesión correctamente.", {
+        position: "top-right",
+        autoClose: 1500,
       });
       
       setIsLoading(false);
@@ -79,11 +76,9 @@ export function RegistroPage() {
 
       // Verificar si la respuesta es exitosa
       if (!response || !response.ok) {
-        Swal.fire({
-          icon: "error",
-          title: "Credenciales incorrectas",
-          text: "El correo o la contraseña son incorrectos. Por favor, verifica tus datos.",
-          confirmButtonColor: "#3085d6",
+        toast.error("El correo o la contraseña son incorrectos. Por favor, verifica tus datos.", {
+          position: "top-right",
+          autoClose: 3000,
         });
         reset({ email: formData.email, password: "" });
         return;
@@ -100,12 +95,9 @@ export function RegistroPage() {
       localStorage.setItem("user", JSON.stringify(data));
 
       // Mostrar mensaje de éxito
-      await Swal.fire({
-        icon: "success",
-        title: "¡Bienvenido!",
-        text: "Has iniciado sesión correctamente.",
-        timer: 1500,
-        showConfirmButton: false,
+      toast.success("¡Bienvenido! Has iniciado sesión correctamente.", {
+        position: "top-right",
+        autoClose: 1500,
       });
 
       // Navegar según el rol
@@ -114,11 +106,9 @@ export function RegistroPage() {
       
     } catch (error) {
       console.error("Error en login:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error de conexión",
-        text: "No se pudo conectar con el servidor. Por favor, intenta nuevamente.",
-        confirmButtonColor: "#d33",
+      toast.error("No se pudo conectar con el servidor. Por favor, intenta nuevamente.", {
+        position: "top-right",
+        autoClose: 3000,
       });
       reset({ email: formData.email, password: "" });
     } finally {

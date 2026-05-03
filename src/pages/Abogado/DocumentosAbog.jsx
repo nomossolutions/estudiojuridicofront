@@ -1,6 +1,5 @@
 import Tablageneral from "../../components/TablaGeneral";
 import Boton from "../../components/Boton";
-import Swal from "sweetalert2";
 import { useState, useEffect } from "react";
 import FormSubirArchivo from "../../components/FormSubirArchivo";
 import BarraBusqueda from "../../components/BarraBusqueda";
@@ -18,7 +17,7 @@ import {
   mostrarConfirmacion,
   cargando,
   cerrarCargando,
-} from "../../helper/alert.Api";
+} from "../../helper/alert.Api.jsx";
 
 const DocumentosAbog = () => {
   const columnas = [

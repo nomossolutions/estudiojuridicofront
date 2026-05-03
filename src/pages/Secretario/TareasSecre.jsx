@@ -1,6 +1,6 @@
 import Tablageneral from "../../components/TablaGeneral";
 import Boton from "../../components/Boton";
-import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import FormNuevaTarea from "../../components/FormNuevaTarea";
 import { useState, useEffect } from "react";
 import BarraBusqueda from "../../components/BarraBusqueda";
@@ -98,28 +98,56 @@ const TareasSecre = () => {
 
   const eliminar = async (id) => {
     const tarea = filasFiltradas.find((item) => item._id === id);
-    const confirmado = await Swal.fire({
-      title: `¿Eliminar la tarea: ${tarea.descripcion}?`,
-      text: "Este cambio no se puede revertir",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Sí, eliminar",
-      cancelButtonText: "Cancelar",
-    });
-
-    if (confirmado.isConfirmed) {
-      const ok = await eliminarTarea(tarea._id);
-      if (ok) {
-        Swal.fire({
-          title: "Eliminado",
-          text: "La tarea fue eliminada correctamente.",
-          icon: "success",
-        });
-        await obtenerFilasFiltradas();
+    
+    const confirmToast = toast.warning(
+      ({ closeToast }) => (
+        <div>
+          <p>¿Eliminar la tarea: {tarea.descripcion}?</p>
+          <p style={{ fontSize: "0.9em", color: "#666" }}>Este cambio no se puede revertir</p>
+          <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+            <button
+              onClick={async () => {
+                closeToast();
+                const ok = await eliminarTarea(tarea._id);
+                if (ok) {
+                  toast.success("La tarea fue eliminada correctamente.");
+                  await obtenerFilasFiltradas();
+                }
+              }}
+              style={{
+                padding: "5px 15px",
+                backgroundColor: "#3085d6",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Sí, eliminar
+            </button>
+            <button
+              onClick={closeToast}
+              style={{
+                padding: "5px 15px",
+                backgroundColor: "#d33",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        position: "top-center",
+        autoClose: false,
+        closeButton: false,
+        draggable: false,
       }
-    }
+    );
   };
   
 

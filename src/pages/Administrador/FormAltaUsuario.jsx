@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const FormAgregarUsuario = ({ show, onHide, onGuardar, itemEditar = null }) => {
@@ -53,20 +53,21 @@ const FormAgregarUsuario = ({ show, onHide, onGuardar, itemEditar = null }) => {
         delete data.newPassword;
       }
       await onGuardar(data);
-      Swal.fire({
-        icon: "success",
-        title: itemEditar ? "¡Usuario actualizado!" : "¡Usuario agregado!",
-        text: itemEditar
+      toast.success(
+        itemEditar
           ? "El usuario fue actualizado exitosamente."
           : "El usuario fue agregado exitosamente.",
-      });
+        {
+          position: "top-right",
+          autoClose: 3000,
+        }
+      );
       reset();
       onHide();
     } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "No se pudo guardar el usuario. Intenta nuevamente.",
+      toast.error("No se pudo guardar el usuario. Intenta nuevamente.", {
+        position: "top-right",
+        autoClose: 3000,
       });
     }
   };

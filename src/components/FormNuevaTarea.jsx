@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import { useForm } from "react-hook-form";
-import Swal from "sweetalert2";
 const FormNuevaTarea = ({
   show,
   onHide,

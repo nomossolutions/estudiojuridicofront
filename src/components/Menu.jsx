@@ -1,6 +1,6 @@
 import { Navbar, Nav, Card, Container } from "react-bootstrap";
 import { NavLink, useNavigate } from "react-router-dom";
-import Swal from "sweetalert2";
+import { toast } from "react-toastify";
 import "../styles/Menu.css";
 import "../styles/navBarHeader.css";
 import { useState, useEffect, useCallback } from "react";
@@ -60,21 +60,51 @@ const Menu = () => {
   }, [obtenerCantidadConsultas]);
 
   const cerrarSesion = () => {
-    Swal.fire({
-      title: "Cerrar sesión",
-      text: "¿Estás seguro de que deseas cerrar sesión?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Sí, cerrar sesión",
-      cancelButtonText: "Cancelar",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        localStorage.removeItem("user");
-        navigate("/");
+    const confirmToast = toast.warning(
+      ({ closeToast }) => (
+        <div>
+          <p>¿Estás seguro?</p>
+          <div style={{ display: "flex", gap: "10px", marginTop: "10px" }}>
+            <button
+              onClick={() => {
+                closeToast();
+                localStorage.removeItem("user");
+                navigate("/");
+              }}
+              style={{
+                padding: "5px 15px",
+                backgroundColor: "#3085d6",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Sí, cerrar sesión
+            </button>
+            <button
+              onClick={closeToast}
+              style={{
+                padding: "5px 15px",
+                backgroundColor: "#d33",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        position: "top-center",
+        autoClose: false,
+        closeButton: false,
+        draggable: false,
       }
-    });
+    );
   };
 
   const handleClickConsultas = async () => {
@@ -104,7 +134,7 @@ const Menu = () => {
         />
         <Navbar.Collapse id="menu-collapse">
           <Card className=" shadow w-100">
-            <Card.Header className="text-center bg-primary text-white">
+            <Card.Header className="text-center bg-oxford-navy text-white">
               <h3 className="fw-bold h4 mb-0">Menú</h3>
             </Card.Header>
             <Card.Body className="p-0">
@@ -126,7 +156,7 @@ const Menu = () => {
                         aria-label={item.ariaLabel}
                       >
                         <span className="me-3" aria-hidden="true">
-                          <IconComponent />
+                          <IconComponent style={{ color: item.color }} />
                         </span>
                         <span className="flex-grow-1">{item.label}</span>
                         {showBadge && (

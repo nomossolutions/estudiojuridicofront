@@ -2,7 +2,6 @@ import Tablageneral from "../../components/TablaGeneral";
 import Boton from "../../components/Boton";
 import FormNuevoJuicio from "../../components/FormNuevoJuicio";
 import { useState, useEffect } from "react";
-import Swal from "sweetalert2";
 import BarraBusqueda from "../../components/BarraBusqueda";
 import {
   listarJuicios,
@@ -17,7 +16,7 @@ import {
   mostrarConfirmacion,
   cargando,
   cerrarCargando,
-} from "../../helper/alert.Api";
+} from "../../helper/alert.Api.jsx";
 
 
 const JuiciosAbog = () => {

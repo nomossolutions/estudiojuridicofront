@@ -15,7 +15,7 @@ import {
   mostrarConfirmacion,
   cargando,
   cerrarCargando,
-} from "../../helper/alert.Api";
+} from "../../helper/alert.Api.jsx";
 
 const ClientesSecre = () => {
   const columnas = [

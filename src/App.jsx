@@ -3,6 +3,8 @@ import "./App.css";
 import { LoginPages } from "./pages/LoginPages";
 import LayoutsUser from "./layouts/LayoutsUser";
 import ErrorPages from "./pages/ErrorPages";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import InicioAdmi from "./pages/Administrador/InicioAdmi";
 import InicioAbog from "./pages/Abogado/InicioAbog";
 import InicioSecre from "./pages/Secretario/InicioSecre";
@@ -29,6 +31,7 @@ import ConsultasNuevas from "./pages/Secretario/consultasNuevas";
 function App() {
   return (
     <BrowserRouter>
+      <ToastContainer />
       <Routes>
         <Route path="/" element={<LoginPages />} />
         <Route path="app" element={<LayoutsUser />}>

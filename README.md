@@ -16,7 +16,7 @@ Mira el demo del proyecto
 - React boostrap
 - [React Hook Form] (https://react-hook-form.com/)
 - [React router dom] (https://reactrouter.com/home)
-- [Sweetalert2] (https://sweetalert2.github.io/)
+- [React Toastify] (https://fkhadra.github.io/react-toastify/introduction)
 - [Uuid] (https://www.npmjs.com/package/uuid)
 - [Jspdf] (https://www.npmjs.com/package/jspm)
 - [Google/genai] (https://ai.google.dev/gemini-api/docs?hl=es-419)
