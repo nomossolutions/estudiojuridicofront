@@ -4,18 +4,121 @@
 
 .FormRegistro {
   width: 100%;
-  max-width: 400px;
-  padding: 25px;
-  background-color: #1E3A5F;
-  color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 480px;
+  padding: 0;
+  background: #1e3a5f;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
   margin: 20px auto;
+  border: none;
+  overflow: hidden;
+}
+
+.FormRegistro .card-body {
+  background-color: #ffffff;
+  border-radius: 16px;
+}
+
+.FormRegistro h3 {
+  color: #2d3748;
+}
+
+.FormRegistro .text-muted {
+  color: #718096 !important;
+  font-size: 0.95rem;
+}
+
+.FormRegistro .form-label {
+  color: #4a5568;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.FormRegistro .form-control {
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.FormRegistro .form-control:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.FormRegistro .form-control.is-invalid {
+  border-color: #f56565;
+}
+
+.FormRegistro .form-control.is-invalid:focus {
+  box-shadow: 0 0 0 3px rgba(245, 101, 101, 0.1);
+}
+
+.FormRegistro .btn-primary {
+  background: #1e3a5f;
+  border: none;
+  border-radius: 10px;
+  padding: 0.85rem;
+  font-size: 1.05rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.FormRegistro .btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.FormRegistro .btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.FormRegistro .btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.FormRegistro .btn-link {
+  padding: 0.5rem;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.FormRegistro .btn-link:hover:not(:disabled) {
+  color: #667eea !important;
+}
+
+.FormRegistro .position-relative .btn-link {
+  right: 8px;
+}
+
+.FormRegistro .invalid-feedback {
+  font-size: 0.875rem;
+  margin-top: 0.35rem;
+}
+
+/* Animación para el ícono de usuario */
+.FormRegistro .bg-primary {
+  background: #1e3a5f !important;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.FormRegistro .bg-primary:hover {
+  transform: scale(1.05);
+}
+
+/* Spinner personalizado */
+.FormRegistro .spinner-border {
+  width: 1rem;
+  height: 1rem;
+  border-width: 2px;
 }
 
 @media (min-width: 768px) {
   .FormRegistro {
-    max-height: 600px;
+    max-height: none;
   }
 }
 
@@ -23,10 +126,23 @@
   .logo-header {
     width: 70px;
   }
+  
+  .FormRegistro {
+    max-width: 90%;
+    margin: 15px auto;
+  }
 }
 
 @media (max-width: 576px) {
   .logo-header {
     width: 50px;
+  }
+  
+  .FormRegistro {
+    max-width: 95%;
+  }
+  
+  .FormRegistro .card-body {
+    padding: 1.5rem !important;
   }
 }

@@ -1,11 +1,28 @@
-import { Form, Button, Card } from "react-bootstrap";
+import { Form, Button, Card, Spinner } from "react-bootstrap";
 import "../styles/RegistroPage.css";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaUser, FaLock } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { login } from "../helper/login.Api";
+
+// Constantes de roles
+const ROLES = {
+  ADMIN: "admin",
+  ABOGADO: "abog",
+  SECRETARIO: "secre",
+};
+
+// Rutas de navegación por rol
+const getRoleRoute = (role) => {
+  const routes = {
+    [ROLES.ADMIN]: "/app/inicioadmi",
+    [ROLES.SECRETARIO]: "/app/iniciosecre",
+    [ROLES.ABOGADO]: "/app/inicioabog",
+  };
+  return routes[role?.toLowerCase()] || "/app/inicio";
+};
 
 export function RegistroPage() {
   const {
@@ -13,153 +30,212 @@ export function RegistroPage() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-  const navegacion = useNavigate();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const passwordVisibility = () => setShowPassword((prev) => !prev);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
-  const loginUser = async (user) => {
-    const { formBasicEmail, formBasicPassword } = user;
+  const loginUser = async (formData) => {
+    setIsLoading(true);
 
+    // Verificar credenciales de admin hardcoded
     if (
-      formBasicEmail === import.meta.env.VITE_ADMIN_EMAIL &&
-      formBasicPassword === import.meta.env.VITE_ADMIN_PASSWORD
+      formData.email === import.meta.env.VITE_ADMIN_EMAIL &&
+      formData.password === import.meta.env.VITE_ADMIN_PASSWORD
     ) {
-      user.role = "admin";
-     localStorage.setItem("user", JSON.stringify(user));
-      Swal.fire({
+      const adminUser = {
+        email: formData.email,
+        password: formData.password,
+        role: "admin",
+      };
+      localStorage.setItem("user", JSON.stringify(adminUser));
+      
+      await Swal.fire({
         icon: "success",
-        title: "¡Inicio de sesión exitoso!",
-        text: "Bienvenido al sistema.",
-        timer: 2000,
+        title: "¡Bienvenido!",
+        text: "Has iniciado sesión correctamente.",
+        timer: 1500,
         showConfirmButton: false,
       });
-      setTimeout(() => {
-        navegacion("/app/inicioadmi");
-      }, 2000);
+      
+      setIsLoading(false);
+      navigate("/app/inicioadmi");
       return;
     }
 
     try {
-      const respuesta = await login({
-        email: formBasicEmail,
-        formBasicPassword: formBasicPassword,
+      const response = await login({
+        email: formData.email,
+        formBasicPassword: formData.password,
       });
 
-      if (respuesta.status !== 200) {
-        const errorText = await respuesta.text();
-        console.error("Error del servidor:", errorText);
-      }
-
-      if (!respuesta || !respuesta.ok) {
+      // Verificar si la respuesta es exitosa
+      if (!response || !response.ok) {
         Swal.fire({
           icon: "error",
-          title: "Usuario o contraseña incorrectas!",
-          text: "Verifica tus datos e intenta nuevamente.",
+          title: "Credenciales incorrectas",
+          text: "El correo o la contraseña son incorrectos. Por favor, verifica tus datos.",
+          confirmButtonColor: "#3085d6",
         });
-        reset();
+        reset({ email: formData.email, password: "" });
         return;
       }
 
-      const data = await respuesta.json();
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data));
+      // Obtener datos del usuario
+      const data = await response.json();
       
-      Swal.fire({
+      // Guardar token y datos del usuario
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+      
+      localStorage.setItem("user", JSON.stringify(data));
+
+      // Mostrar mensaje de éxito
+      await Swal.fire({
         icon: "success",
-        title: "¡Inicio de sesión exitoso!",
-        text: "Bienvenido al sistema.",
-        timer: 2000,
+        title: "¡Bienvenido!",
+        text: "Has iniciado sesión correctamente.",
+        timer: 1500,
         showConfirmButton: false,
       });
+
+      // Navegar según el rol
+      const route = getRoleRoute(data.role);
+      navigate(route);
       
-      const rol = data.role ? data.role.toLowerCase() : "";
-      setTimeout(() => {
-        if (rol === "admin") navegacion("/app/inicioadmi");
-        else if (rol === "secre") navegacion("/app/iniciosecre");
-        else if (rol === "abog") navegacion("/app/inicioabog");
-        else navegacion("/app/inicio");
-      }, 2000);
     } catch (error) {
+      console.error("Error en login:", error);
       Swal.fire({
         icon: "error",
         title: "Error de conexión",
-        text: "No se pudo contactar al servidor.",
+        text: "No se pudo conectar con el servidor. Por favor, intenta nuevamente.",
+        confirmButtonColor: "#d33",
       });
-      reset();
+      reset({ email: formData.email, password: "" });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <Card className="FormRegistro">
-      <div>
-        <h3 className="text-center">Iniciar Sesión</h3>
-      </div>
-      <Form onSubmit={handleSubmit(loginUser)}>
-        <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>Email</Form.Label>
-          <Form.Control
-            type="email"
-            placeholder="Ingresar email"
-            {...register("formBasicEmail", {
-              required: "El correo es obligatorio",
-              pattern: {
-                value:
-                  /^[a-z0-9!#$%&'+/=?^_`{|}~-]+(?:.[a-z0-9!#$%&'+/=?^_`{|}~-]+)@(?:[a-z0-9](?:[a-z0-9-][a-z0-9])?.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/,
-                message: "El formato es inválido",
-              },
-            })}
-          />
-          <Form.Text className="text-danger">
-            {errors.formBasicEmail?.message}
-          </Form.Text>
-        </Form.Group>
+    <Card className="FormRegistro shadow-lg">
+      <Card.Body className="p-4">
+        <div className="text-center mb-4">
+          <div className="mb-3">
+            <div 
+              className="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary text-white"
+              style={{ width: "60px", height: "60px" }}
+            >
+              <FaUser size={28} />
+            </div>
+          </div>
+          <h3 className="fw-bold mb-2">Iniciar Sesión</h3>
+          <p className="text-muted mb-0">Ingresa tus credenciales para continuar</p>
+        </div>
 
-        <Form.Group className="mb-3" controlId="formBasicPassword">
-          <div className="input-group">
+        <Form onSubmit={handleSubmit(loginUser)}>
+          <Form.Group className="mb-4" controlId="email">
+            <Form.Label className="fw-semibold">
+              <FaUser className="me-2" />
+              Correo Electrónico
+            </Form.Label>
             <Form.Control
-              type={showPassword ? "text" : "password"}
-              placeholder="Contraseña"
-              {...register("formBasicPassword", {
-                required: "La contraseña es obligatoria",
+              type="email"
+              placeholder="ejemplo@correo.com"
+              size="lg"
+              {...register("email", {
+                required: "El correo electrónico es obligatorio",
                 pattern: {
-                  value:
-                    /^(?=.*\d)(?=.*[\u0021-\u002b\u003c-\u0040])(?=.*[A-Z])(?=.*[a-z])\S{8,16}$/,
-                  message:
-                    "Debe tener entre 8 y 16 caracteres, al menos un dígito, una minúscula, una mayúscula y un caracter especial.",
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: "Formato de correo inválido",
                 },
               })}
+              isInvalid={!!errors.email}
+              disabled={isLoading}
             />
-            <Button
-              variant="outline-secondary"
-              type="button"
-              onClick={passwordVisibility}
-              aria-label={
-                showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
-              }
+            <Form.Control.Feedback type="invalid">
+              {errors.email?.message}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          <Form.Group className="mb-4" controlId="password">
+            <Form.Label className="fw-semibold">
+              <FaLock className="me-2" />
+              Contraseña
+            </Form.Label>
+            <div className="position-relative">
+              <Form.Control
+                type={showPassword ? "text" : "password"}
+                placeholder="Ingresa tu contraseña"
+                size="lg"
+                {...register("password", {
+                  required: "La contraseña es obligatoria",
+                  minLength: {
+                    value: 3,
+                    message: "La contraseña debe tener al menos 3 caracteres",
+                  },
+                })}
+                isInvalid={!!errors.password}
+                disabled={isLoading}
+                style={{ paddingRight: "45px" }}
+              />
+              <Button
+                variant="link"
+                type="button"
+                onClick={togglePasswordVisibility}
+                disabled={isLoading}
+                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                className="position-absolute top-50 end-0 translate-middle-y text-muted"
+                style={{ 
+                  border: "none", 
+                  background: "transparent",
+                  zIndex: 10 
+                }}
+              >
+                {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+              </Button>
+              <Form.Control.Feedback type="invalid">
+                {errors.password?.message}
+              </Form.Control.Feedback>
+            </div>
+          </Form.Group>
+
+          <div className="d-grid gap-2 mt-4">
+            <Button 
+              variant="primary" 
+              type="submit" 
+              size="lg"
+              disabled={isLoading}
+              className="fw-semibold"
             >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
+              {isLoading ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                    className="me-2"
+                  />
+                  Iniciando sesión...
+                </>
+              ) : (
+                "Iniciar Sesión"
+              )}
             </Button>
           </div>
-          <Form.Text className="text-danger">
-            {errors.formBasicPassword?.message}
-          </Form.Text>
-        </Form.Group>
-
-        <Form.Group className="mb-3" controlId="formBasicCheckbox">
-          <Form.Check type="checkbox" label="Recuérdame" />
-        </Form.Group>
-
-        <div className="d-flex justify-content-center">
-          <Button variant="primary" type="submit" className="w-100">
-            Iniciar Sesión
-          </Button>
-        </div>
-      </Form>
-      <a href="*" className="text-center m-2">
-        Olvidé mi contraseña
-      </a>
+        </Form>
+      </Card.Body>
     </Card>
   );
 }

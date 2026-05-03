@@ -1,40 +1,73 @@
-import { Navbar, Nav, Card, Container, Button } from "react-bootstrap";
+import { Navbar, Nav, Card, Container } from "react-bootstrap";
 import { NavLink, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import "../styles/Menu.css";
 import "../styles/navBarHeader.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   contarConsultasNoLeidas,
   marcarConsultasLeidas,
 } from "../helper/consulta.Api";
+import { FaSignOutAlt } from "react-icons/fa";
+import { getMenuByRole, ROLES } from "../config/menuConfig";
 
-import {
-  FaHome,
-  FaUser,
-  FaBalanceScale,
-  FaUsers,
-  FaChartBar,
-  FaCalendarAlt,
-  FaMoneyBillWave,
-  FaFolder,
-  FaSignOutAlt,
-  FaEnvelope,
-} from "react-icons/fa";
+// Intervalo de polling en milisegundos (30 segundos)
+const POLLING_INTERVAL = 30000;
 
 const Menu = () => {
   const navigate = useNavigate();
   const [cantidadConsultas, setCantidadConsultas] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Obtener usuario de manera segura
+  const getUser = useCallback(() => {
+    try {
+      const userStr = localStorage.getItem("user");
+      if (!userStr) return null;
+      return JSON.parse(userStr);
+    } catch (error) {
+      console.error("Error al parsear usuario del localStorage:", error);
+      return null;
+    }
+  }, []);
+
+  const usuario = getUser();
+  const role = usuario?.role;
+
+  // Obtener cantidad de consultas con manejo de errores
+  const obtenerCantidadConsultas = useCallback(async () => {
+    if (role !== ROLES.SECRETARIO) return;
+    
+    try {
+      setIsLoading(true);
+      const cantidad = await contarConsultasNoLeidas();
+      setCantidadConsultas(cantidad || 0);
+    } catch (error) {
+      console.error("Error al obtener consultas no leídas:", error);
+      setCantidadConsultas(0);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [role]);
+
+  // Efecto para polling de consultas
+  useEffect(() => {
+    obtenerCantidadConsultas();
+    
+    const interval = setInterval(obtenerCantidadConsultas, POLLING_INTERVAL);
+    
+    return () => clearInterval(interval);
+  }, [obtenerCantidadConsultas]);
 
   const cerrarSesion = () => {
     Swal.fire({
-      title: `Cerrar sesión`,
-      text: "¿Estás seguro de esto?",
+      title: "Cerrar sesión",
+      text: "¿Estás seguro de que deseas cerrar sesión?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
-      confirmButtonText: "Aceptar",
+      confirmButtonText: "Sí, cerrar sesión",
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
@@ -44,110 +77,85 @@ const Menu = () => {
     });
   };
 
-  useEffect(() => {
-    const obtenerCantidad = async () => {
-      const cantidad = await contarConsultasNoLeidas();
-      setCantidadConsultas(cantidad);
-    };
-    obtenerCantidad();
-    const interval = setInterval(obtenerCantidad, 15000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const usuario = JSON.parse(localStorage.getItem("user"));
-  const role = usuario?.role;
-
   const handleClickConsultas = async () => {
-    await marcarConsultasLeidas();
-    const cantidad = await contarConsultasNoLeidas();
-    setCantidadConsultas(cantidad);
-  };
-
-  const menus = () => {
-    switch (role) {
-      case "admin":
-        return [
-          { to: "inicioadmi", label: "Inicio", icon: <FaHome /> },
-          { to: "usuariosadmi", label: "Usuarios", icon: <FaUsers /> },
-          { to: "documentosadmi", label: "Documentos", icon: <FaFolder /> },
-          { to: "reportesadmi", label: "Reportes", icon: <FaChartBar /> },
-        ];
-      case "abog":
-        return [
-          { to: "inicioabog", label: "Inicio", icon: <FaHome /> },
-          { to: "agendaabog", label: "Agenda", icon: <FaCalendarAlt /> },
-          { to: "clienteabog", label: "Cliente", icon: <FaUsers /> },
-          { to: "documentoabog", label: "Documento", icon: <FaFolder /> },
-          { to: "tareasabog", label: "Tareas", icon: <FaFolder /> },
-          {
-            to: "facturacionabog",
-            label: "Facturación",
-            icon: <FaMoneyBillWave />,
-          },
-          { to: "juiciosabog", label: "Juicios", icon: <FaBalanceScale /> },
-        ];
-      case "secre":
-        return [
-          { to: "iniciosecre", label: "Inicio", icon: <FaHome /> },
-          { to: "agendasecre", label: "Agenda", icon: <FaCalendarAlt /> },
-          { to: "clientesecre", label: "Cliente", icon: <FaUser /> },
-          { to: "documentossecre", label: "Documentos", icon: <FaFolder /> },
-          { to: "tareassecre", label: "Tareas", icon: <FaFolder /> },
-          {
-            to: "facturacionsecre",
-            label: "Facturación",
-            icon: <FaMoneyBillWave />,
-          },
-          {
-            to: "consultasnuevas",
-            label: "Consultas Nuevas",
-            icon: <FaEnvelope />,
-            badge: cantidadConsultas,
-            onClick: handleClickConsultas,
-          },
-        ];
-      default:
-        return [];
+    try {
+      await marcarConsultasLeidas();
+      await obtenerCantidadConsultas();
+    } catch (error) {
+      console.error("Error al marcar consultas como leídas:", error);
     }
   };
 
-  const menuItems = menus();
+  // Obtener items del menú según el rol
+  const menuItems = getMenuByRole(role);
+
+  // Si no hay usuario o rol válido, no mostrar menú
+  if (!usuario || !role || menuItems.length === 0) {
+    return null;
+  }
 
   return (
-    <Navbar expand="lg" className="h-100 flex-column">
+    <Navbar expand="lg" className="h-100 flex-column" aria-label="Menú de navegación principal">
       <Container className="mb-3">
-        <Navbar.Toggle aria-controls="menu-collapse" className="my-2" />
+        <Navbar.Toggle 
+          aria-controls="menu-collapse" 
+          aria-label="Alternar menú de navegación"
+          className="my-2" 
+        />
         <Navbar.Collapse id="menu-collapse">
-          <Card className="border-primary shadow w-100">
-            <Card.Header className="text-center">
-              <h3 className="fw-bold h4">Menu</h3>
+          <Card className=" shadow w-100">
+            <Card.Header className="text-center bg-primary text-white">
+              <h3 className="fw-bold h4 mb-0">Menú</h3>
             </Card.Header>
             <Card.Body className="p-0">
-              <Nav className="flex-column p-0 m-0 w-100">
-                {menuItems.map((item) => (
-                  <NavLink
-                    to={item.to}
-                    key={item.to}
-                    onClick={item.onClick}
-                    className="align-items-center py-3 px-4 border-bottom text-decoration-none navhover d-flex w-100"
+              <Nav className="flex-column p-0 m-0 w-100" as="ul">
+                {menuItems.map((item) => {
+                  const IconComponent = item.icon;
+                  const showBadge = item.hasBadge && cantidadConsultas > 0;
+                  
+                  return (
+                    <Nav.Item as="li" key={item.to}>
+                      <NavLink
+                        to={item.to}
+                        onClick={item.hasBadge ? handleClickConsultas : undefined}
+                        className={({ isActive }) =>
+                          `align-items-center py-3 px-4 border-bottom text-decoration-none navhover d-flex w-100 ${
+                            isActive ? "active" : ""
+                          }`
+                        }
+                        aria-label={item.ariaLabel}
+                      >
+                        <span className="me-3" aria-hidden="true">
+                          <IconComponent />
+                        </span>
+                        <span className="flex-grow-1">{item.label}</span>
+                        {showBadge && (
+                          <span 
+                            className="badge bg-danger rounded-pill ms-2" 
+                            aria-live="polite"
+                            aria-label={`${cantidadConsultas} consultas no leídas`}
+                          >
+                            {cantidadConsultas}
+                          </span>
+                        )}
+                      </NavLink>
+                    </Nav.Item>
+                  );
+                })}
+                
+                <Nav.Item as="li">
+                  <button
+                    type="button"
+                    className="align-items-center py-3 px-4 border-bottom text-decoration-none navhover d-flex w-100 botonCerrarSesion bg-transparent border-0 text-start"
+                    onClick={cerrarSesion}
+                    aria-label="Cerrar sesión"
                   >
-                    <span className="me-3">{item.icon}</span>
-                    {item.label}
-                    {item.badge > 0 && (
-                      <span className="badge bg-danger ms-2">{item.badge}</span>
-                    )}
-                  </NavLink>
-                ))}
-                <Button
-                  variant="link"
-                  className="align-items-center py-3 px-4 border-bottom text-decoration-none navhover d-flex w-100 botonCerrarSesion"
-                  onClick={cerrarSesion}
-                >
-                  <span className="me-3">
-                    <FaSignOutAlt />
-                  </span>
-                  Cerrar sesión
-                </Button>
+                    <span className="me-3" aria-hidden="true">
+                      <FaSignOutAlt />
+                    </span>
+                    <span className="flex-grow-1">Cerrar sesión</span>
+                  </button>
+                </Nav.Item>
               </Nav>
             </Card.Body>
           </Card>

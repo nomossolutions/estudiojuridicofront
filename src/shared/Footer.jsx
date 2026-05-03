@@ -45,6 +45,23 @@ const Footer = () => {
             </div>
             <div className="col-lg-8 col-md-12 col-12 mt-4">
                 <span>© {currentYear} Estudio Juridico. Todos los derechos reservados.</span>
+                <div className="mt-2">
+                    <span className="text-white-50">Desarrollado por </span>
+                    <a 
+                        href="https://nomos-solutions.vercel.app/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-white fw-light text-decoration-none"
+                        style={{ 
+                            transition: "all 0.3s ease",
+                            borderBottom: "1px solid transparent" 
+                        }}
+                        onMouseEnter={(e) => e.target.style.borderBottomColor = "white"}
+                        onMouseLeave={(e) => e.target.style.borderBottomColor = "transparent"}
+                    >
+                        Nomos Solutions
+                    </a>
+                </div>
             </div>
 
             
