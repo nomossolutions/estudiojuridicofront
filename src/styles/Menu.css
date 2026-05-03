@@ -4,17 +4,17 @@
 }
 
 .navhover:hover {
-  background-color: #4A6FA5;
-  color: #fff;
+  background-color: #E8E8E8;
+  color: #333;
 }
 
 .navhover:active {
-  background-color: #4A6FA5;
+  background-color: #E8E8E8;
 }
 
 .navhover.active {
-  background-color: #4A6FA5;
-  color: #fff;
+  background-color: #E8E8E8;
+  color: #333;
   
 }
 
