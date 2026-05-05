@@ -49,7 +49,6 @@ const TareasAbog = () => {
       }));
       setFilasFiltradas(tareaTransformada);
     } catch (error) {
-      console.error("Error al obtener la tarea:", error);
     }
   };
 

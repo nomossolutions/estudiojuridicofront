@@ -19,7 +19,6 @@ const ConsultasNuevas = () => {
     if (data) {
       setFilasFiltradas(data);
     } else {
-      console.error("Error al obtener consultas");
     }
   };
 

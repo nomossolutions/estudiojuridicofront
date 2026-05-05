@@ -18,7 +18,6 @@ export const listarArchivos = async (nombreCliente = "", fecha = "") => {
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -36,7 +35,6 @@ export const crearArchivos = async (formData) => {
     if (!respuesta.ok) throw new Error("Error al crear el documento");
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -56,7 +54,6 @@ export const actualizarDocumentos = async (formData, id) => {
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -76,7 +73,6 @@ export const eliminarDocumento = async (_id) => {
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -105,7 +101,6 @@ export const descargarDocumento = async (id) => {
     link.click();
     return true;
   } catch (error) {
-    console.error(error);
     return false;
   }
 };

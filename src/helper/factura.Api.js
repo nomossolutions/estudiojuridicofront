@@ -23,7 +23,6 @@ export const listarFacturas = async (
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -41,7 +40,6 @@ export const crearFacturas = async (formData) => {
     if (!respuesta.ok) throw new Error("Error al crear la factura");
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -61,7 +59,6 @@ export const actualizarFacturas = async (formData, id) => {
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -81,7 +78,6 @@ export const eliminarFacturas = async (_id) => {
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -110,7 +106,6 @@ export const descargarFactura = async (id) => {
     link.click();
     return true;
   } catch (error) {
-    console.error(error);
     return false;
   }
 };

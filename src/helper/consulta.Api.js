@@ -15,7 +15,6 @@ export const crearConsulta = async (consultaNueva) => {
     const resultado = await respuesta.json();
     return resultado;
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -33,7 +32,6 @@ export const listarConsultas = async (fecha = "") => {
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -45,7 +43,6 @@ export const contarConsultasNoLeidas = async () => {
     const data = await respuesta.json();
     return data.length;
   } catch (error) {
-    console.error(error);
     return 0;
   }
 };
@@ -57,7 +54,6 @@ export const marcarConsultasLeidas = async () => {
     if (!respuesta.ok) throw new Error("Error al marcar consultas como leídas");
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return null;
   }
 };

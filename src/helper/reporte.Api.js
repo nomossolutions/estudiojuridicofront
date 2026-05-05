@@ -24,7 +24,6 @@ export const obtenerMovimientosAgenda = async () => {
     
     return movimientos;
   } catch (error) {
-    console.error(error);
     return [];
   }
 };

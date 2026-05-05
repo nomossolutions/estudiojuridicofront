@@ -15,7 +15,6 @@ export const listarTareas = async (estado = "", fecha = "") => {
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return [];
   }
 };
@@ -36,7 +35,6 @@ export const crearTarea = async (tareaNueva) => {
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return [];
   }
 };
@@ -58,7 +56,6 @@ export const actualizarTarea = async (tarea) => {
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return [];
   }
 };
@@ -78,7 +75,6 @@ export const eliminarTarea = async (_id) => {
     }
     return true;
   } catch (error) {
-    console.error(error);
     return false;
   }
 };

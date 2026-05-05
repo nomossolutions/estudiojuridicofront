@@ -27,7 +27,6 @@ const Contacto = () => {
         reset();
       }
     } catch (error) {
-      console.error("Error al enviar la consulta:", error);
     }
   };
 

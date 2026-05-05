@@ -27,7 +27,6 @@ export default function ChatCentral() {
         setChatSession(chat);
       }
     } catch (error) {
-      console.error("Error al iniciar chat:", error);
     }
   }, []);
 
@@ -53,7 +52,6 @@ export default function ChatCentral() {
         { role: "model", content: respuesta },
       ]);
     } catch (error) {
-      console.error("Error de la API:", error);
       setMensajes([
         ...historialActualizado,
         { role: "model", content: "Lo siento, hubo un error de conexión." },

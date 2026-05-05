@@ -2,12 +2,30 @@ import { Container, Row, Col } from "react-bootstrap";
 import Menu from "../components/Menu";
 import Footer from "../shared/Footer";
 import NavBarHeaderLogin from "../components/NavBarHeaderLogin";
-import { Outlet } from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
 import "../styles/layoutsAdmi.css";
 
 const LayoutsAdmi = () => {
-  const usuarioLogueado = JSON.parse(sessionStorage.getItem("user"));
-  const role = usuarioLogueado?.role.toLowerCase();
+  const userString = localStorage.getItem("user");
+  
+  // Si no hay usuario, redirigir al login
+  if (!userString) {
+    return <Navigate to="/" />;
+  }
+  
+  let usuarioLogueado;
+  try {
+    usuarioLogueado = JSON.parse(userString);
+  } catch (error) {
+    return <Navigate to="/" />;
+  }
+  
+  if (!usuarioLogueado?.role) {
+    return <Navigate to="/" />;
+  }
+  
+  const role = usuarioLogueado.role.toLowerCase();
+  
   return (
     <div className="app-layout">
       <NavBarHeaderLogin></NavBarHeaderLogin>

@@ -40,7 +40,6 @@ const DocumentosAdmi = () => {
       }));
       setFilasFiltradas(ArchivoTransformado);
     } catch (error) {
-      console.error("Error al obtener el archivo:", error);
     }
   };
 

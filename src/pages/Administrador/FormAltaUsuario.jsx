@@ -18,7 +18,7 @@ const FormAgregarUsuario = ({ show, onHide, onGuardar, itemEditar = null }) => {
       apellido: "",
       email: "",
       telefono: "",
-      formBasicPassword: "",
+      password: "",
       newPassword: "",
       role: "",
     },
@@ -34,7 +34,7 @@ const FormAgregarUsuario = ({ show, onHide, onGuardar, itemEditar = null }) => {
       setValue("email", itemEditar.email || "");
       setValue("telefono", itemEditar.telefono || "");
       setValue("role", itemEditar.role || "");
-      setValue("formBasicPassword", "");
+      setValue("password", "");
       setValue("newPassword", "");
     } else {
       reset();
@@ -46,9 +46,9 @@ const FormAgregarUsuario = ({ show, onHide, onGuardar, itemEditar = null }) => {
       if (itemEditar && itemEditar._id) {
         data._id = itemEditar._id;
         if (!data.newPassword) {
-          delete data.formBasicPassword;
+          delete data.password;
         } else {
-          data.formBasicPassword = data.newPassword;
+          data.password = data.newPassword;
         }
         delete data.newPassword;
       }
@@ -181,7 +181,7 @@ const FormAgregarUsuario = ({ show, onHide, onGuardar, itemEditar = null }) => {
               <div className="input-group">
                 <Form.Control
                   type={showPassword ? "text" : "password"}
-                  {...register("formBasicPassword", {
+                  {...register("password", {
                     required: "La contraseña es obligatoria",
                     pattern: {
                       value:
@@ -199,9 +199,9 @@ const FormAgregarUsuario = ({ show, onHide, onGuardar, itemEditar = null }) => {
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
                 </Button>
               </div>
-              {errors.formBasicPassword && (
+              {errors.password && (
                 <small className="text-danger">
-                  {errors.formBasicPassword.message}
+                  {errors.password.message}
                 </small>
               )}
             </Form.Group>

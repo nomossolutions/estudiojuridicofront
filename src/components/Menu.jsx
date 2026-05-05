@@ -26,7 +26,6 @@ const Menu = () => {
       if (!userStr) return null;
       return JSON.parse(userStr);
     } catch (error) {
-      console.error("Error al parsear usuario del localStorage:", error);
       return null;
     }
   }, []);
@@ -43,7 +42,6 @@ const Menu = () => {
       const cantidad = await contarConsultasNoLeidas();
       setCantidadConsultas(cantidad || 0);
     } catch (error) {
-      console.error("Error al obtener consultas no leídas:", error);
       setCantidadConsultas(0);
     } finally {
       setIsLoading(false);
@@ -69,6 +67,7 @@ const Menu = () => {
               onClick={() => {
                 closeToast();
                 localStorage.removeItem("user");
+                localStorage.removeItem("token");
                 navigate("/");
               }}
               style={{
@@ -112,7 +111,6 @@ const Menu = () => {
       await marcarConsultasLeidas();
       await obtenerCantidadConsultas();
     } catch (error) {
-      console.error("Error al marcar consultas como leídas:", error);
     }
   };
 

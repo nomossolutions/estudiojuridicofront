@@ -46,40 +46,32 @@ export function RegistroPage() {
   const loginUser = async (formData) => {
     setIsLoading(true);
 
-    // Verificar credenciales de admin hardcoded
-    if (
-      formData.email === import.meta.env.VITE_ADMIN_EMAIL &&
-      formData.password === import.meta.env.VITE_ADMIN_PASSWORD
-    ) {
-      const adminUser = {
-        email: formData.email,
-        password: formData.password,
-        role: "admin",
-      };
-      localStorage.setItem("user", JSON.stringify(adminUser));
-      
-      toast.success("¡Bienvenido! Has iniciado sesión correctamente.", {
-        position: "top-right",
-        autoClose: 1500,
-      });
-      
-      setIsLoading(false);
-      navigate("/app/inicioadmi");
-      return;
-    }
-
     try {
       const response = await login({
         email: formData.email,
-        formBasicPassword: formData.password,
+        password: formData.password,
       });
 
       // Verificar si la respuesta es exitosa
       if (!response || !response.ok) {
-        toast.error("El correo o la contraseña son incorrectos. Por favor, verifica tus datos.", {
+        // Intentar obtener el mensaje de error del backend
+        let errorData = {};
+        try {
+          errorData = await response?.json();
+        } catch (e) {
+          // Error al parsear respuesta
+        }
+        
+        setIsLoading(false);
+        
+        // Mostrar el error del backend si existe
+        const errorMsg = errorData.message || "El correo o la contraseña son incorrectos. Por favor, verifica tus datos.";
+        
+        toast.error(errorMsg, {
           position: "top-right",
-          autoClose: 3000,
+          autoClose: 5000,
         });
+        
         reset({ email: formData.email, password: "" });
         return;
       }
@@ -90,6 +82,13 @@ export function RegistroPage() {
       // Guardar token y datos del usuario
       if (data.token) {
         localStorage.setItem("token", data.token);
+      } else {
+        setIsLoading(false);
+        toast.error("Error: El servidor no devolvió un token", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+        return;
       }
       
       localStorage.setItem("user", JSON.stringify(data));
@@ -100,19 +99,20 @@ export function RegistroPage() {
         autoClose: 1500,
       });
 
-      // Navegar según el rol
+      // Navegar según el rol después de un breve delay
       const route = getRoleRoute(data.role);
-      navigate(route);
+      
+      setTimeout(() => {
+        navigate(route);
+      }, 1600);
       
     } catch (error) {
-      console.error("Error en login:", error);
+      setIsLoading(false);
       toast.error("No se pudo conectar con el servidor. Por favor, intenta nuevamente.", {
         position: "top-right",
         autoClose: 3000,
       });
       reset({ email: formData.email, password: "" });
-    } finally {
-      setIsLoading(false);
     }
   };
 

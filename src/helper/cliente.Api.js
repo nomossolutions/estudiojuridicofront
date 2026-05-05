@@ -13,7 +13,6 @@ export const listarClientes = async (identificador = "") => {
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -34,7 +33,6 @@ export const crearCliente = async (clienteNuevo) => {
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -54,7 +52,6 @@ export const actualizarCliente = async (cliente) => {
     }
     return await respuesta.json();
   } catch (error) {
-     console.error(error);
     return null;
   }
 };
@@ -74,7 +71,6 @@ export const eliminarCliente = async (_id) => {
     }
     return true;
   } catch (error) {
-     console.error(error);
     return false;
   }
 };

@@ -24,7 +24,6 @@ export const listarCitas = async (cliente = "", fecha = "") => {
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -61,7 +60,6 @@ export const crearCita = async (citaNueva) => {
 
     return resultado;
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -99,7 +97,6 @@ export const actualizarCita = async (cita) => {
 
     return resultado;
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -147,7 +144,6 @@ export const eliminarCita = async (_id) => {
 
     return true;
   } catch (error) {
-    console.error(error);
     return false;
   }
 };

@@ -8,7 +8,8 @@ const NavBarHeaderLogin = () => {
   const navigate = useNavigate();
   const cerrarSesion = (e) => {
     e.preventDefault();
-    sessionStorage.removeItem("user");
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
     navigate("/");
   };
 

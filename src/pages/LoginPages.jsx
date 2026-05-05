@@ -3,12 +3,12 @@ import { RegistroPage } from "../components/RegistroPage";
 import Footer from "../shared/Footer";
 import "../styles/loginPage.css";
 
-export const LoginPages = ({ setUsuarioLogeado }) => {
+export const LoginPages = () => {
   return (
     <div className="app-layout">
       <NavBarHeaderLogin />
       <main className="main-content">
-        <RegistroPage setUsuarioLogeado={setUsuarioLogeado} />
+        <RegistroPage />
       </main>
       <Footer />
     </div>

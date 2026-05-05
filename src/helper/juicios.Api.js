@@ -17,7 +17,6 @@ export const listarJuicios = async (numeroExpediente = "") => {
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return [];
   }
 };
@@ -37,7 +36,6 @@ export const crearJuicios = async (formData) => {
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -57,7 +55,6 @@ export const actualizarJuicios = async (formData, id) => {
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -77,7 +74,6 @@ export const eliminarJuicios = async (_id) => {
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return false;
   }
 };
@@ -109,7 +105,6 @@ export const descargarJuicio = async (id) => {
     link.click();
     return true;
   } catch (error) {
-    console.error(error);
     return false;
   }
 };

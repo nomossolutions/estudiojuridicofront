@@ -1,15 +1,27 @@
 const urlUsuarios = import.meta.env.VITE_API_USUARIOS;
 
+// Función helper para manejar errores de autenticación
+const handleAuthError = (status) => {
+  if (status === 401) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/";
+    throw new Error("Sesión expirada. Por favor, inicia sesión nuevamente.");
+  }
+};
+
 export const listarAbogados = async () => {
   try {
     const token = localStorage.getItem("token");
     const respuesta = await fetch(`${urlUsuarios}?role=abog`, {
       headers: { "Authorization": `Bearer ${token}` },
     });
+    
+    handleAuthError(respuesta.status);
+    
     if (!respuesta.ok) throw new Error("Error al obtener abogados");
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return [];
   }
 };
@@ -28,12 +40,14 @@ export const listarUsuarios = async ( search = "") => {
         "Authorization": `Bearer ${token}`,
         "Content-Type": "application/json",
        } });
+    
+    handleAuthError(respuesta.status);
+    
     if (!respuesta.ok) {
       throw new Error("Error al obtener usuarios");
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return [];
   }
 };
@@ -49,12 +63,14 @@ export const crearUsuario = async (usuarioNuevo) => {
       },
       body: JSON.stringify(usuarioNuevo),
     });
+    
+    handleAuthError(respuesta.status);
+    
     if (!respuesta.ok) {
       throw new Error("Error al crear el usuario");
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -71,12 +87,14 @@ export const actualizarUsuario = async (usuario) => {
       },
       body: JSON.stringify(body),
     });
+    
+    handleAuthError(respuesta.status);
+    
     if (!respuesta.ok) {
       throw new Error("Error al actualizar el usuario");
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return null;
   }
 };
@@ -91,12 +109,14 @@ export const eliminarUsuario = async (id) => {
         "Authorization": `Bearer ${token}`,
       },
     });
+    
+    handleAuthError(respuesta.status);
+    
     if (!respuesta.ok) {
       throw new Error("Error al eliminar el usuario");
     }
     return await respuesta.json();
   } catch (error) {
-    console.error(error);
     return null;
   }
 };

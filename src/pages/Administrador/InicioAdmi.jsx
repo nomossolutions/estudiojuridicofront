@@ -1,6 +1,8 @@
 import { Row, Col, Card } from "react-bootstrap";
 import { useEffect, useState } from "react";
-import  {listarUsuarios} from "../../helper/usuario.Api";
+import { listarUsuarios } from "../../helper/usuario.Api";
+import { FaUsers, FaUserShield, FaUserTie, FaUserEdit } from "react-icons/fa";
+import "../../styles/InicioAdmi.css";
 
 const InicioAdmi = () => {
   const [usuariosGuardadas, setUsuariosGuardadas] = useState([]);
@@ -11,7 +13,6 @@ const InicioAdmi = () => {
         const usuarios = await listarUsuarios();
       setUsuariosGuardadas(usuarios);
     }catch(error){
-        console.error("Error al obtener usuarios:", error);
       }
   };
   obtenerUsuarios();
@@ -38,44 +39,56 @@ const InicioAdmi = () => {
 
   const { abogados, secretaria, admin, usuariosTotales } = contarUusuario();
   return (
-    <>
-      <Row className="justify-content-center">
+    <div className="inicio-admin-container">
+      <Row className="mb-4">
         <Col md={12}>
-          <Card className="mt-3 text-center fs-1 bg-primary text-light">
+          <Card className="card-principal text-light text-center">
             <Card.Body>
-              <Card.Title>Usuarios totales:</Card.Title>
-              <Card.Text>{usuariosTotales}</Card.Text>
+              <div className="card-icon">
+                <FaUsers />
+              </div>
+              <Card.Title>Total de Usuarios</Card.Title>
+              <Card.Text className="total-usuarios">{usuariosTotales}</Card.Text>
             </Card.Body>
           </Card>
         </Col>
       </Row>
-      <Row>
-        <Col md={4}>
-          <Card className="mt-3 text-center fs-1 bg-secondary text-light">
+      <Row className="g-3">
+        <Col md={4} sm={12}>
+          <Card className="card-secundaria card-admin text-light">
             <Card.Body>
-              <Card.Title>Administradores activos:</Card.Title>
-              <Card.Text>{admin}</Card.Text>
+              <div className="card-icon">
+                <FaUserShield />
+              </div>
+              <Card.Title>Administradores</Card.Title>
+              <Card.Text className="numero-usuarios">{admin}</Card.Text>
             </Card.Body>
           </Card>
         </Col>
-        <Col md={4}>
-          <Card className="mt-3 text-center fs-1 bg-secondary text-light">
+        <Col md={4} sm={12}>
+          <Card className="card-secundaria card-abogados text-light">
             <Card.Body>
-              <Card.Title>Abogados activos:</Card.Title>
-              <Card.Text>{abogados}</Card.Text>
+              <div className="card-icon">
+                <FaUserTie />
+              </div>
+              <Card.Title>Abogados</Card.Title>
+              <Card.Text className="numero-usuarios">{abogados}</Card.Text>
             </Card.Body>
           </Card>
         </Col>
-        <Col md={4}>
-          <Card className="mt-3 text-center fs-1 bg-secondary text-light">
+        <Col md={4} sm={12}>
+          <Card className="card-secundaria card-secretaria text-light">
             <Card.Body>
-              <Card.Title>Secretario/a activos/as:</Card.Title>
-              <Card.Text>{secretaria}</Card.Text>
+              <div className="card-icon">
+                <FaUserEdit />
+              </div>
+              <Card.Title>Secretarios/as</Card.Title>
+              <Card.Text className="numero-usuarios">{secretaria}</Card.Text>
             </Card.Body>
           </Card>
         </Col>
       </Row>
-    </>
+    </div>
   );
 };
 
